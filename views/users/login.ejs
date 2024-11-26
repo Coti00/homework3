@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <style>
+        /* 기본적인 스타일 리셋 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5c9ded;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #5c9ded;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4a8cc8;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-footer a {
+            color: #5c9ded;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>로그인</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">이메일:</label>
+                <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호:</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+            <button type="submit">로그인</button>
+        </form>
+        <div class="form-footer">
+            <p>계정이 없으신가요? <a href="/register">회원가입</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();  // 폼 제출 기본 동작 방지
+    
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+    
+            try {
+                const loginResponse = await fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+    
+                const loginData = await loginResponse.json();
+    
+                if (loginData.status === 'success') {
+                    // JWT 토큰을 localStorage에 저장
+                    localStorage.setItem('accessToken', loginData.data.accessToken);
+                    localStorage.setItem('refreshToken', loginData.data.refreshToken);
+    
+                    // 프로필 정보 요청
+                    const profileResponse = await fetch('http://localhost:3000/auth/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${loginData.data.accessToken}` // 토큰 포함
+                        },
+                    });
+    
+                    const profileData = await profileResponse.json();
+    
+                    if (profileData.status === 'success') {
+                        // userId를 localStorage에 저장
+                        localStorage.setItem('userId', profileData.data._id);
+    
+                        // 로그인 후 메인 페이지로 리디렉션
+                        window.location.href = '/main'; // main.ejs로 이동
+                    } else {
+                        alert('프로필 정보를 가져오지 못했습니다: ' + profileData.message);
+                    }
+                } else {
+                    alert('로그인 실패: ' + loginData.message);
+                }
+            } catch (error) {
+                console.error('로그인 오류:', error);
+                alert('로그인 중 오류가 발생했습니다.');
+            }
+        });
+    </script>
+    
+</body>
+</html>

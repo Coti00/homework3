@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인 페이지</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* 기본적인 스타일 리셋 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 기본 body 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #userName {
+            font-size: 13px;
+            font-weight: 600;
+            margin-inline: 20px;
+        }
+
+        #logoutBtn, #myPageBtn, #companyinfo{
+            color: white;
+            font: 500 15px 'arial';
+            margin-inline: 10px;
+        }
+
+        #logoutBtn:hover, #myPageBtn:hover, #companyinfo:hover {
+            cursor: pointer;
+            color: gray;
+        }
+
+        /* 채용 공고 리스트 스타일 */
+        main {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        #jobList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* 각 채용 공고 카드 스타일 */
+        .job-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .job-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+
+        .job-card p {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #7f8c8d;
+        }
+
+        .job-card p strong {
+            color: #2c3e50;
+        }
+
+        .job-card a {
+            display: block;
+            margin-top: 15px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .job-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            background-color: #5c9ded;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4a8cc8;
+        }
+
+        /* 페이지네이션 스타일 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 13px;
+            margin-bottom: 50px;
+        }
+
+        .pagination button {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font: bold 14px 'arial';
+        }
+
+        .pagination button:hover {
+            background-color: #2980b9;
+        }
+
+        .pagination span {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        /* 북마크 버튼 */
+        .bookmark-btn {
+            background-color: #f1c40f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .bookmark-btn.active {
+            background-color: #e67e22; /* 활성화된 경우 색상 변경 */
+        }
+
+        .bookmark-btn:hover {
+            background-color: #f39c12;
+        }
+
+        #logotitle{
+            font: bold 20px 'arial';
+        }
+        #logotitle:hover{
+            cursor: pointer;
+        }
+
+        #headerwrapper{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        label{
+            font: bold 14px 'arial';
+        }
+
+        input{
+            margin-right: 10px;
+            width: 130px;
+        }
+
+        #search, #resetFilters{
+            font: bold 13px 'arial';
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header style="margin-bottom: 30px;">
+        <div class="header-content">
+            <p id="logotitle"  onclick = "window.location.href = '/main'">알려잡!</p>
+            <div id="headerwrapper">
+                <p id="companyinfo" onclick="window.location.href='/companyinfo'">회사찾기</p>
+                <p id="myPageBtn" onclick="window.location.href='/profile'">My Page</p>
+                <p id="logoutBtn" onclick="window.location.href='/'">로그아웃</p>
+            </div>
+        </div>
+    </header>
+    <section id="filters">
+        <form id="filterForm">
+            <label for="keyword">키워드:</label>
+            <input type="text" id="keyword" name="keyword" placeholder="예: 개발자, 엔지니어" />
+    
+            <label for="companyName">회사명:</label>
+            <input type="text" id="companyName" name="company_name" placeholder="예: 삼성, 네이버" />
+    
+            <label for="position">포지션:</label>
+            <input type="text" id="position" name="position" placeholder="예: 백엔드, 프론트엔드" />
+    
+            <button type="submit" id="search">검색</button>
+            <button type="button" id="resetFilters">초기화</button>
+        </form>
+    </section>
+    <!-- 채용 공고 리스트 -->
+    <main>
+        <section id="jobList">
+            <!-- 채용 공고가 여기에 표시됩니다 -->
+        </section>
+
+        <!-- 페이지네이션 버튼 -->
+        <div id="pagination" class="pagination">
+            <!-- 페이지네이션 버튼들이 동적으로 삽입됩니다 -->
+        </div>
+    </main>
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        // 로그인한 사용자의 이름을 가져옵니다.
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            // 프로필 정보 요청
+            fetch('http://localhost:3000/auth/profile', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('userName').textContent = `안녕하세요, ${data.data.profile.name}님`;
+                } else {
+                    alert('프로필 정보를 불러오는 데 실패했습니다.');
+                }
+            })
+            .catch(error => console.error('프로필 로드 오류:', error));
+
+            // 사용자 북마크 상태를 불러옵니다.
+            fetch('http://localhost:3000/auth/bookmarks', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(bookmarkData => {
+                if (bookmarkData.status === 'success') {
+                    const serverBookmarks = bookmarkData.data
+                        .filter(bookmark => bookmark.jobId !== null)
+                        .map(bookmark => bookmark.jobId._id);
+
+                    const localBookmarks = JSON.parse(localStorage.getItem('userBookmarks')) || [];
+                    
+                    // 병합하여 중복 제거
+                    const mergedBookmarks = Array.from(new Set([...serverBookmarks, ...localBookmarks]));
+
+                    localStorage.setItem('userBookmarks', JSON.stringify(mergedBookmarks));
+
+                    // 필요한 경우 병합된 데이터를 사용하여 로드
+                    loadJobs(currentPage, mergedBookmarks);
+                }
+            })
+            .catch(error => console.error('북마크 로드 오류:', error));
+
+            // 지원 정보 로드 및 로컬 스토리지 동기화
+            fetch('http://localhost:3000/auth/applications', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const userApplications = data.data.applications
+                        .filter(application => application.jobId !== null) // 유효한 jobId만 포함
+                        .map(application => application.jobId._id); // jobId의 _id 추출
+                    localStorage.setItem('userApplications', JSON.stringify(userApplications));
+                } else {
+                    console.error('지원 정보를 불러오는 데 실패했습니다.');
+                }
+            })
+            .catch(error => console.error('지원 정보 로드 오류:', error));
+
+        }
+
+        // 로그아웃 버튼 클릭 시 처리
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            localStorage.removeItem('accessToken');
+            window.location.href = '/'; // 로그인 페이지로 리디렉션
+        });
+
+       // 필터 폼 제출 이벤트 처리
+        document.getElementById('filterForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const filters = {
+                keyword: document.getElementById('keyword').value.trim(),
+                company_name: document.getElementById('companyName').value.trim(),
+                position: document.getElementById('position').value.trim(),
+            };
+
+            // 필터 값이 비어있는 경우 제외
+            Object.keys(filters).forEach((key) => {
+                if (!filters[key]) {
+                    delete filters[key];
+                }
+            });
+            document.getElementById('pagination').style.display = 'none';
+            // 필터링된 데이터 로드
+            loadFilteredJobs(currentPage, filters);
+        });
+
+        // 초기화 버튼 이벤트 처리
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // 필터링된 채용 공고 로드 함수
+        function loadFilteredJobs(page, filters) {
+            const queryParams = new URLSearchParams({
+                page,
+                limit: itemsPerPage,
+                ...filters,
+            }).toString();
+
+            fetch(`http://localhost:3000/jobs/search?${queryParams}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status === 'success') {
+                        const jobList = data.data;
+                        const jobListSection = document.getElementById('jobList');
+                        jobListSection.innerHTML = ''; // 기존 목록 초기화
+
+                        jobList.forEach((job) => {
+                            const jobCard = document.createElement('div');
+                            jobCard.classList.add('job-card');
+                            jobCard.innerHTML = `
+                                <h3>${job.title}</h3>
+                                <p><strong>회사명:</strong> ${job.company}</p>
+                                <p><strong>위치:</strong> ${job.location}</p>
+                                <p><strong>경력:</strong> ${job.career?.join(', ') || '정보 없음'}</p>
+                                <p><strong>학력:</strong> ${job.education || '정보 없음'}</p>
+                                <p><strong>직무 분야:</strong> ${job.job_sector?.join(', ') || '정보 없음'}</p>
+                                <p><strong>연봉:</strong> ${job.salary || '협의 가능'} 원</p>
+                                <p><strong>조회수:</strong> ${job.views}</p>
+                                <a href="${job.link}" target="_blank">채용 공고 보기</a>
+                                <br>
+                                <button class="apply-btn" data-job-id="${job._id}">지원하기</button>
+                                <button class="bookmark-btn" data-job-id="${job._id}">북마크</button>
+                            `;
+
+                            const bookmarkButton = jobCard.querySelector('.bookmark-btn');
+                            const userBookmarks = JSON.parse(localStorage.getItem('userBookmarks')) || [];
+                            if (userBookmarks.includes(job._id)) {
+                                bookmarkButton.classList.add('active');
+                            }
+
+                            bookmarkButton.addEventListener('click', () => toggleBookmark(job._id, bookmarkButton));
+
+                            const applyButton = jobCard.querySelector('.apply-btn');
+                            applyButton.addEventListener('click', () => applyForJob(job._id));
+
+                            jobListSection.appendChild(jobCard);
+                        });
+
+                    } else {
+                        alert('필터링된 데이터를 가져오는 데 실패했습니다.');
+                    }
+                })
+                .catch((error) => console.error('필터링 오류:', error));
+        }
+
+        function loadJobs(page, userBookmarks) {
+            fetch(`http://localhost:3000/jobs?page=${page}&limit=${itemsPerPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    const jobList = data.data;
+                    const jobListSection = document.getElementById('jobList');
+                    jobListSection.innerHTML = ''; // 기존 채용 공고를 비운 후 새로 추가
+
+                    jobList.forEach(job => {
+                        const jobCard = document.createElement('div');
+                        jobCard.classList.add('job-card');
+                        jobCard.innerHTML = `
+                            <h3>${job.title}</h3>
+                            <p><strong>회사명:</strong> ${job.company}</p>
+                            <p><strong>위치:</strong> ${job.location}</p>
+                            <p><strong>경력:</strong> ${job.career.join(', ')}</p>
+                            <p><strong>학력:</strong> ${job.education}</p>
+                            <p><strong>직무 분야:</strong> ${job.job_sector.join(', ')}</p>
+                            <p><strong>연봉:</strong> ${job.salary} 원</p>
+                            <p><strong>조회수:</strong> ${job.views}</p>
+                            <a href="${job.link}" target="_blank">채용 공고 보기</a>
+                            <br>
+                            <button class="apply-btn" data-job-id="${job._id}">지원하기</button>
+                            <button class="bookmark-btn" data-job-id="${job._id}">북마크</button>
+                        `;
+
+                        const bookmarkButton = jobCard.querySelector('.bookmark-btn');
+                        if (userBookmarks && userBookmarks.includes(job._id)) {
+                            bookmarkButton.classList.add('active');
+                        }
+
+                        // 지원 상태 확인
+                        const userApplications = JSON.parse(localStorage.getItem('userApplications')) || [];
+                        if (userApplications.includes(job._id)) {
+                            const applyButton = jobCard.querySelector('.apply-btn');
+                            applyButton.classList.add('active'); // 지원된 경우 버튼 색상 변경
+                            applyButton.innerText = '이미 지원한 공고';
+                            applyButton.disabled = true; // 이미 지원한 경우 버튼 비활성화
+                        }
+
+                        const applyButton = jobCard.querySelector('.apply-btn');
+                        applyButton.addEventListener('click', function() {
+                            applyForJob(job._id);
+                        });
+
+                        jobListSection.appendChild(jobCard);
+
+                        // 북마크 버튼 클릭 이벤트 추가
+                        bookmarkButton.addEventListener('click', function() {
+                            toggleBookmark(job._id, bookmarkButton);
+                        });
+                    });
+
+                    // 페이지네이션 버튼 생성
+                    const totalPages = Math.ceil(data.pagination.totalItems / itemsPerPage);
+                    const pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+
+                    const prevButton = document.createElement('button');
+                    prevButton.innerText = '이전';
+                    prevButton.disabled = currentPage === 1;
+                    prevButton.addEventListener('click', () => {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            loadJobs(currentPage, userBookmarks);
+                        }
+                    });
+                    pagination.appendChild(prevButton);
+
+                    const pageSpan = document.createElement('span');
+                    pageSpan.innerText = `${currentPage} / ${totalPages}`;
+                    pagination.appendChild(pageSpan);
+
+                    const nextButton = document.createElement('button');
+                    nextButton.innerText = '다음';
+                    nextButton.disabled = currentPage === totalPages;
+                    nextButton.addEventListener('click', () => {
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            loadJobs(currentPage, userBookmarks);
+                        }
+                    });
+                    pagination.appendChild(nextButton);
+                })
+                .catch(error => console.error('채용 공고 로드 오류:', error));
+        }
+        // 초기 페이지 로드
+        loadJobs(currentPage, JSON.parse(localStorage.getItem('userBookmarks')) || []);
+
+        // 북마크 처리
+        function toggleBookmark(jobId, buttonElement) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            fetch('http://localhost:3000/auth/bookmarks', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ jobId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.message === '북마크가 추가되었습니다.') {
+                        buttonElement.classList.add('active');
+                    } else {
+                        buttonElement.classList.remove('active');
+                    }
+
+                    const updatedBookmarks = JSON.parse(localStorage.getItem('userBookmarks')) || [];
+                    if (data.message === '북마크가 추가되었습니다.') {
+                        updatedBookmarks.push(jobId);
+                    } else {
+                        const index = updatedBookmarks.indexOf(jobId);
+                        if (index > -1) {
+                            updatedBookmarks.splice(index, 1);
+                        }
+                    }
+                    localStorage.setItem('userBookmarks', JSON.stringify(updatedBookmarks));
+                } else {
+                    alert('북마크 처리 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('북마크 처리 오류:', error));
+        }
+
+        // 지원하기 함수
+        function applyForJob(jobId) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            fetch('http://localhost:3000/auth/applications', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ jobId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('지원이 완료되었습니다!');
+                    // 지원 내역을 localStorage에 저장
+                    const userApplications = JSON.parse(localStorage.getItem('userApplications')) || [];
+                    userApplications.push(jobId);
+                    localStorage.setItem('userApplications', JSON.stringify(userApplications));
+                    window.location.href = '/main'; // 지원 후 프로필 페이지로 리디렉션
+                } else {
+                    alert('지원에 실패했습니다. 다시 시도해주세요.');
+                }
+            })
+            .catch(error => console.error('지원 처리 오류:', error));
+        }
+    </script>
+</body>
+</html>

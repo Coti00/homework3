@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 정보 수정</title>
+    <style>
+        /* 기본 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 0;
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #userName {
+            font: bold 20px 'arial';
+            margin-bottom: 30px;
+        }
+
+        #logoutBtn, #myPageBtn, #companyinfo {
+            color: white;
+            font: 500 15px 'arial';
+            margin-inline: 10px;
+        }
+
+        #logoutBtn:hover, #myPageBtn:hover, #companyinfo:hover {
+            cursor: pointer;
+            color: gray;
+        }
+
+        /* 기본 body 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            min-height: 100vh;
+        }
+
+
+        .profile-edit-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin-top: 100px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: gray;
+        }
+
+        .message {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+        label{
+            padding-left: 10px;
+        }
+        #headerwrapper{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        #logotitle{
+            font: bold 20px 'arial';
+        }
+        #logotitle:hover{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header style="margin-bottom: 30px;">
+        <div class="header-content">
+            <p id="logotitle"  onclick = "window.location.href = '/main'">알려잡!</p>
+            <div id="headerwrapper">
+                <p id="companyinfo" onclick="window.location.href='/companyinfo'">회사찾기</p>
+                <p id="myPageBtn" onclick="window.location.href='/profile'">My Page</p>
+                <p id="logoutBtn" onclick="window.location.href='/'">로그아웃</p>
+            </div>
+        </div>
+    </header>
+    <div class="profile-edit-container">
+        <h1>회원 정보 수정</h1>
+        <form id="profileEditForm">
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" name="name" required />
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호 (변경 시 입력):</label>
+                <input type="password" id="password" name="password" />
+            </div>
+            <button type="submit">수정하기</button>
+        </form>
+        <div id="responseMessage" class="message"></div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('accessToken');
+
+        // 초기 사용자 정보 불러오기
+        fetch('http://localhost:3000/auth/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const { name } = data.data.profile;
+                document.getElementById('name').value = name;
+            } else {
+                document.getElementById('responseMessage').textContent = '사용자 정보를 불러오는 데 실패했습니다.';
+                document.getElementById('responseMessage').classList.add('error');
+            }
+        })
+        .catch(error => console.error('프로필 로드 오류:', error));
+
+        // 폼 제출 처리
+        document.getElementById('profileEditForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const password = document.getElementById('password').value;
+
+            // 이메일을 제외하고 이름과 비밀번호만 전송
+            const requestData = { name };
+            if (password) {
+                requestData.password = password;
+            }
+
+            fetch('http://localhost:3000/auth/profile', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const message = document.getElementById('responseMessage');
+                if (data.status === 'success') {
+                    message.textContent = '회원 정보가 성공적으로 수정되었습니다.';
+                    message.className = 'message success';
+                    alert('회원정보가 수정되었습니다!')
+                    window.location.href = 'main'; // 메인 페이지로 리다이렉트
+                } else {
+                    message.textContent = '회원 정보 수정에 실패했습니다.';
+                    message.className = 'message error';
+                }
+            })
+            .catch(error => {
+                console.error('회원 정보 수정 오류:', error);
+                const message = document.getElementById('responseMessage');
+                message.textContent = '회원 정보 수정 중 오류가 발생했습니다.';
+                message.className = 'message error';
+            });
+        });
+    </script>
+</body>
+</html>

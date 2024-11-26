@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회사 검색</title>
+    <style>
+        /* 기본 스타일 리셋 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            min-height: 100vh;
+        }
+    
+        /* 헤더 스타일 */
+        header {
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 0;
+        }
+    
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    
+        #logotitle {
+            font: bold 20px 'arial';
+        }
+    
+        #logotitle:hover {
+            cursor: pointer;
+        }
+    
+        #headerwrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    
+        #logoutBtn, #myPageBtn, #companyinfo {
+            color: white;
+            font: 500 15px 'arial';
+            margin-inline: 10px;
+        }
+    
+        #logoutBtn:hover, #myPageBtn:hover, #companyinfo:hover {
+            cursor: pointer;
+            color: gray;
+        }
+    
+        /* 회사 검색 기본 스타일 */
+        h1 {
+            margin-bottom: 20px;
+        }
+    
+        form {
+            margin-bottom: 20px;
+        }
+    
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+    
+        input {
+            width: 300px;
+        }
+    
+        .results {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+    
+        .company {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        .company h3 {
+            margin: 0 0 10px;
+        }
+    
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    
+        .pagination button {
+            padding: 5px 10px;
+        }
+    
+        .review-button, .view-reviews-button {
+            margin-top: 10px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            font: bold 14px 'arial';
+        }
+    
+        .review-button:hover, .view-reviews-button:hover {
+            background-color: gray;
+        }
+    
+        #popup, #reviewsPopup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            width: calc(50%);
+            height: auto;
+        }
+    
+        #popup form,
+        #reviewsPopup .reviews-list {
+            display: flex;
+            flex-direction: column;
+        }
+        #popup{
+            padding-top: 5px;
+        }
+        #popup form input{
+            margin-bottom: 10px;
+            padding: 10px;
+            font: bold 13px 'arial';
+            width: 100%;
+            height: 30px;
+        }
+        #popup form textarea, 
+        #popup form button {
+            margin-bottom: 10px;
+            padding: 10px;
+            font: bold 13px 'arial';
+            width: 100%;
+        }
+    
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+    
+        #closePopup, #closeReviewsPopup {
+            color: black;
+            background-color: transparent;
+            width: auto;
+            height: auto;
+            text-align: center;
+            font-size: 20px;   
+            padding: 0;
+            border: none;
+            margin-bottom: 10px;
+            
+        }
+        #reviewsPopup{
+            padding-top: 5px;
+        }
+        #reviewsPopup .reviews-list p {
+            margin-bottom: 5px;
+        }
+        #reviewForm > label{
+            font: bold 13px 'arial';
+            margin-top: 10px;
+        }
+        #reviewButton{
+            font: bold 20px 'arial';
+            margin-top: 20px;
+            border: none;
+            background-color: #2c3e50;
+            border-radius: 5px;
+            color: white;
+        }
+        #reviewButton:hover{
+            cursor: pointer;
+            background-color: gray;
+        }
+        .delete-review-button{
+            font: bold 14px 'arial';
+            background-color: rgb(241, 72, 72);
+            padding:5px 10px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .delete-review-button:hover{
+            cursor: pointer;
+            background-color: gray;
+        }
+        #find{
+            font: bold 14px 'arial';
+            border: none;
+            background-color: #2c3e50;
+            border-radius: 5px;
+            color: white;
+            padding: 8px 10px;
+        }
+        #find:hover{
+            background-color: gray;
+            cursor: pointer;
+        }
+        #companyName{
+            border-radius: 5px;
+            border: 0.5px solid gray;
+            font: bold 14px 'arial';
+        }
+        #reviewitem{
+            border-bottom: 1px solid gray;
+            width: calc(70%);
+            padding: 5px 10px;
+        }
+        #searchForm > select{
+            height: 35px;
+            border-radius: 5px;
+            border: 0.5px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <header style="margin-bottom: 30px;">
+        <div class="header-content">
+            <p id="logotitle" onclick="window.location.href = '/main'">알려잡!</p>
+            <div id="headerwrapper">
+                <p id="companyinfo" onclick="window.location.href='/companyinfo'">회사찾기</p>
+                <p id="myPageBtn" onclick="window.location.href='/profile'">My Page</p>
+                <p id="logoutBtn" onclick="window.location.href='/'">로그아웃</p>
+            </div>
+        </div>
+    </header>
+    <h1>회사 검색</h1>
+    <form id="searchForm">
+        <input type="text" id="companyName" placeholder="회사 이름을 입력하세요" />
+        <select id="companyType">
+            <option value="">유형 선택</option>
+            <option value="대기업">대기업</option>
+            <option value="중견기업">중견기업</option>
+            <option value="중소기업">중소기업</option>
+        </select>
+        <select id="salaryRange">
+            <option value="">연봉 선택</option>
+            <option value="5000">5000만 이상</option>
+            <option value="3000">3000만 이상</option>
+            <option value="1000">1000만 이상</option>
+        </select>
+        <select id="revenueSort">
+            <option value="">매출 정렬</option>
+            <option value="desc">매출 많은 순</option>
+            <option value="asc">매출 적은 순</option>
+        </select>
+        <button type="submit" id="find">찾기</button>
+    </form>
+
+    
+
+    <div class="results" id="results"></div>
+    <div class="pagination" id="pagination"></div>
+
+    <div id="overlay"></div>
+    <div id="popup">
+        <button id="closePopup">x</button>
+        <form id="reviewForm">
+            <label for="rating">평점 (1~5):</label>
+            <input type="number" id="rating" min="1" max="5" required />
+            <label for="reviewText">리뷰 내용:</label>
+            <textarea id="reviewText" rows="4" required></textarea>
+            <button type="submit" id="reviewButton">작성</button>
+        </form>
+    </div>
+    <div id="reviewsPopup">
+        <button id="closeReviewsPopup">x</button>
+        <div class="reviews-list" id="reviewsList"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const resultsDiv = document.getElementById('results');
+        const paginationDiv = document.getElementById('pagination');
+        const popup = document.getElementById('popup');
+        const reviewsPopup = document.getElementById('reviewsPopup');
+        const overlay = document.getElementById('overlay');
+        const closePopup = document.getElementById('closePopup');
+        const closeReviewsPopup = document.getElementById('closeReviewsPopup');
+        const reviewForm = document.getElementById('reviewForm');
+        const reviewsList = document.getElementById('reviewsList');
+
+        let currentPage = 1;
+        let currentCompanyId = null;
+
+        const fetchCompanies = (name, type, salary, sort, page = 1) => {
+            resultsDiv.innerHTML = '검색 중...';
+
+            let query = `/company?page=${page}`;
+            if (name) query += `&name=${encodeURIComponent(name)}`;
+            if (type) query += `&type=${encodeURIComponent(type)}`;
+            if (salary) query += `&salary=${encodeURIComponent(salary)}`;
+            if (sort) query += `&sort=${encodeURIComponent(sort)}`;
+            fetch(query)
+                .then(response => response.json())
+                .then(data => {
+                    displayCompanies(data.data);
+                    setupPagination(data.pagination, name, type, salary, sort);
+                })
+                .catch(error => {
+                    console.error(error);
+                    resultsDiv.innerHTML = '<p>회사 정보를 가져오는 중 오류가 발생했습니다.</p>';
+                });
+        };
+
+        const displayCompanies = (companies) => {
+            if (companies.length === 0) {
+                resultsDiv.innerHTML = '<p>검색 결과가 없습니다.</p>';
+                return;
+            }
+            resultsDiv.innerHTML = '';
+            companies.forEach(company => {
+                const companyDiv = document.createElement('div');
+                companyDiv.className = 'company';
+                companyDiv.innerHTML = `
+                    <h3>${company.company_name}</h3>
+                    <p><strong>유형:</strong> ${company.company_type || '정보 없음'}</p>
+                    <p><strong>웹사이트:</strong> ${
+                        company.website && company.website !== '정보 없음' 
+                            ? `<a href="${company.website}" target="_blank">${company.website}</a>` 
+                            : '정보 없음'
+                    }</p>
+                    <p><strong>주소:</strong> ${company.address || '정보 없음'}</p>
+                    <p><strong>대표:</strong> ${company.ceo_name || '정보 없음'}</p>
+                    <p><strong>산업군:</strong> ${company.industry || '정보 없음'}</p>
+                    <p><strong>직원 수:</strong> ${company.employee_count || '정보 없음'}</p>
+                    <p><strong>연봉:</strong> ${company.salary || '정보 없음'}</p>
+                    <p><strong>매출:</strong> ${formatRevenue(company.revenue)}</p>
+                    <p><strong>설명:</strong> ${company.description || '정보 없음'}</p>
+                    <button class="review-button" data-company-id="${company._id}">리뷰 작성</button>
+                    <button class="view-reviews-button" data-company-id="${company._id}">리뷰 보기</button>
+                `;
+                resultsDiv.appendChild(companyDiv);
+            });
+
+            document.querySelectorAll('.review-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    currentCompanyId = e.target.getAttribute('data-company-id');
+                    showPopup();
+                });
+            });
+
+            document.querySelectorAll('.view-reviews-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const companyId = e.target.getAttribute('data-company-id');
+                    fetchReviews(companyId);
+                });
+            });
+        };
+
+        const fetchReviews = (companyId) => {
+            fetch(`/review/${companyId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        reviewsList.innerHTML = '';
+                        const currentUserId = localStorage.getItem('userId'); // 로컬스토리지에서 userId 가져오기
+                        
+                        data.data.reviews.forEach(review => {
+                            const reviewItem = document.createElement('div');
+                            reviewItem.style.display = 'flex';
+                            reviewItem.style.justifyContent = 'space-between';
+                            reviewItem.style.alignItems = 'center';
+                            reviewItem.style.marginBlock = '10px';
+
+                            // 평점에 따라 별 생성
+                            const stars = Array.from({ length: 5 }, (_, i) => 
+                                i < review.rating ? '★' : '☆'
+                            ).join('');
+
+                            reviewItem.innerHTML = `
+                                <p id="reviewitem"> <strong>${review.userId.profile.name}</strong> : ${review.reviewText} </br> <span>${stars}</span></p>
+                                ${
+                                    review.userId._id === currentUserId
+                                        ? `<button class="delete-review-button" data-review-id="${review._id}">삭제</button>`
+                                        : ''
+                                }
+                            `;
+
+                            reviewsList.appendChild(reviewItem);
+                        });
+
+                        // 삭제 버튼 이벤트 추가
+                        document.querySelectorAll('.delete-review-button').forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                const reviewId = e.target.getAttribute('data-review-id');
+                                deleteReview(reviewId);
+                            });
+                        });
+
+                        showReviewsPopup();
+                    } else {
+                        reviewsList.innerHTML = '<p>등록된 리뷰가 없습니다.</p>';
+                        showReviewsPopup();
+                    }
+                })
+                .catch(error => console.error('리뷰 가져오기 오류:', error));
+        };
+
+
+        const deleteReview = (reviewId) => {
+            const accessToken = localStorage.getItem('accessToken');
+            fetch(`/review/${reviewId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('리뷰가 삭제되었습니다.');
+                    reviewsPopup.style.display = 'none';
+                    fetchReviews(currentCompanyId); // 삭제 후 리뷰 새로고침
+                } else {
+                    alert('리뷰 삭제 실패: ' + data.message);
+                }
+            })
+            .catch(error => console.error('리뷰 삭제 오류:', error));
+        };
+
+
+        const setupPagination = (pagination, name) => {
+            paginationDiv.innerHTML = '';
+            if (pagination.totalPages > 1) {
+                if (pagination.currentPage > 1) {
+                    const prevButton = document.createElement('button');
+                    prevButton.textContent = '이전';
+                    prevButton.addEventListener('click', () => {
+                        currentPage--;
+                        fetchCompanies(name, currentPage);
+                    });
+                    paginationDiv.appendChild(prevButton);
+                }
+                const pageSpan = document.createElement('span');
+                pageSpan.textContent = `${pagination.currentPage} / ${pagination.totalPages}`;
+                paginationDiv.appendChild(pageSpan);
+                if (pagination.currentPage < pagination.totalPages) {
+                    const nextButton = document.createElement('button');
+                    nextButton.textContent = '다음';
+                    nextButton.addEventListener('click', () => {
+                        currentPage++;
+                        fetchCompanies(name, currentPage);
+                    });
+                    paginationDiv.appendChild(nextButton);
+                }
+            }
+        };
+
+        const showPopup = () => {
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        };
+
+        const hidePopup = () => {
+            popup.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+
+        const showReviewsPopup = () => {
+            reviewsPopup.style.display = 'block';
+            overlay.style.display = 'block';
+        };
+
+        const hideReviewsPopup = () => {
+            reviewsPopup.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+
+        closePopup.addEventListener('click', hidePopup);
+        closeReviewsPopup.addEventListener('click', hideReviewsPopup);
+        overlay.addEventListener('click', () => {
+            hidePopup();
+            hideReviewsPopup();
+        });
+
+        reviewForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rating = document.getElementById('rating').value;
+            const reviewText = document.getElementById('reviewText').value;
+
+            fetch('/review', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify({ companyId: currentCompanyId, rating, reviewText })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('리뷰가 작성되었습니다.');
+                        hidePopup();
+                    } else {
+                        alert('이미 리뷰를 작성했습니다.');
+                    }
+                })
+                .catch(error => console.error('리뷰 작성 오류:', error));
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('companyName').value.trim();
+            const type = document.getElementById('companyType').value; // 회사 유형 선택
+            const salary = document.getElementById('salaryRange').value; // 연봉 선택
+            const sort = document.getElementById('revenueSort').value;
+
+            const numericSalary = salary ? parseInt(salary.replace(/,/g, ''), 10) : null;
+
+            if (!name && !type && !numericSalary && !sort) {
+                resultsDiv.innerHTML = '<p>검색 조건을 입력하거나 선택하세요.</p>';
+                return;
+            }
+            currentPage = 1;
+            fetchCompanies(name, type, numericSalary, sort, currentPage);
+        });
+
+        const formatRevenue = (revenue) => {
+            if (revenue === 0 || revenue === null || revenue === undefined) {
+                return '정보 없음';
+            }
+            if (revenue >= 1e12) {
+                return `${(revenue / 1e12).toFixed(2)} 조 원`;
+            }
+            if (revenue >= 1e8) {
+                return `${(revenue / 1e8).toFixed(2)} 억 원`;
+            }
+            return `${revenue.toLocaleString()} 원`;
+        };
+    </script>
+</body>
+</html>
+

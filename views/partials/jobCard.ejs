@@ -1,0 +1,15 @@
+<!-- jobCard.ejs -->
+<div class="job-card">
+    <h3><%= job.title %></h3>
+    <p><strong>회사명:</strong> <%= job.company %></p>
+    <p><strong>위치:</strong> <%= job.location %></p>
+    <p><strong>경력:</strong> <%= job.career.join(', ') %></p>
+    <p><strong>학력:</strong> <%= job.education %></p>
+    <p><strong>직무 분야:</strong> <%= job.job_sector.join(', ') %></p>
+    <p><strong>연봉:</strong> <%= job.salary %> 원</p>
+    <p><strong>조회수:</strong> <%= job.views %></p>
+    <a href="<%= job.link %>" target="_blank">채용 공고 보기</a>
+    <br>
+    <button>북마크</button>
+    <button>지원하기</button>
+</div>
