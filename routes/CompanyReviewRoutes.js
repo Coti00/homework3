@@ -28,7 +28,7 @@ const authMiddleware = require("../middleware/authMiddleware"); // 인증 미들
  *               companyId:
  *                 type: string
  *                 description: "리뷰를 작성할 회사의 ID"
- *                 example: "672c8ea05a4e5098b667e2af"
+ *                 example: "672c801100efb1288b6d65d5"
  *               rating:
  *                 type: integer
  *                 description: "회사의 평점 (1-5)"
@@ -40,16 +40,6 @@ const authMiddleware = require("../middleware/authMiddleware"); // 인증 미들
  *     responses:
  *       201:
  *         description: "회사 리뷰가 작성되었습니다."
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "회사 리뷰가 작성되었습니다."
- *                 review:
- *                   $ref: '#/components/schemas/CompanyReview'
  *       500:
  *         description: "서버 오류"
  */
@@ -70,19 +60,10 @@ router.post("/", authMiddleware, createCompanyReview);
  *         schema:
  *           type: string
  *         description: "리뷰를 조회할 회사의 ID"
- *         example: "672c8ea05a4e5098b667e2af"
+ *         example: "회사 ID"
  *     responses:
  *       200:
  *         description: "리뷰 목록 반환"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 reviews:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/CompanyReview'
  *       404:
  *         description: "해당 회사에 대한 리뷰가 없습니다."
  *       500:
@@ -110,14 +91,6 @@ router.get("/:companyId", getCompanyReviews);
  *     responses:
  *       200:
  *         description: "리뷰 삭제 성공"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "리뷰가 삭제되었습니다."
  *       404:
  *         description: "리뷰를 찾을 수 없습니다."
  *       500:

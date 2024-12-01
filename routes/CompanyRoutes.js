@@ -42,24 +42,6 @@ const {
  *     responses:
  *       200:
  *         description: "회사 목록 반환"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Company'
- *                 pagination:
- *                   type: object
- *                   properties:
- *                     currentPage:
- *                       type: integer
- *                     totalPages:
- *                       type: integer
- *                     totalItems:
- *                       type: integer
  *       500:
  *         description: "서버 오류"
  */
@@ -82,10 +64,6 @@ router.route("/").get(getAllCompanies); // 회사 리스트 조회 및 필터링
  *     responses:
  *       201:
  *         description: "회사 추가 성공"
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Company'
  *       400:
  *         description: "잘못된 요청"
  */
@@ -109,10 +87,6 @@ router.route("/").post(createCompany); // 회사 정보 추가
  *     responses:
  *       200:
  *         description: "회사 정보 반환"
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Company'
  *       404:
  *         description: "회사 찾을 수 없음"
  *       500:
@@ -144,10 +118,6 @@ router.route("/:id").get(getCompanyById); // 특정 회사 조회
  *     responses:
  *       200:
  *         description: "회사 정보 업데이트 성공"
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Company'
  *       404:
  *         description: "회사 찾을 수 없음"
  *       500:

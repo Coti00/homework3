@@ -211,7 +211,10 @@ const deleteUser = async (req, res) => {
     try {
         const userId = req.user.userId; // 인증된 사용자 ID
         await User.findByIdAndDelete(userId);
-        res.status(204).send(); // 삭제 성공
+        res.status(204).send({
+            status: "success",
+            message:"회원탈퇴가 성공적으로 이루어졌습니다."
+        }); // 삭제 성공
     } catch (error) {
         console.error(error);
         res.status(500).send({

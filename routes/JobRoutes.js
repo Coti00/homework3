@@ -37,49 +37,15 @@ const {
  *              example: 20
  *            description: 페이지당 항목 수 (기본값:20)
  *          - in: query
- *            name: sort
+ *            name: filter
  *            required: false
  *            schema:
  *              type: string
- *              example: date
- *            description: 정렬 기준 (기본값:날짜)
+ *              example: '{"location":"세종","experience":"5년","salary":0,"technology":"백엔드"}'
+ *            description: 'location : 위치, experience : 경력, salary : 연봉, technology : 직업섹터'
  *      responses:
  *          200:
  *              description: 채용 공고 목록이 성공적으로 조회되었습니다.
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              totalJobs:
- *                                  type: integer
- *                              totalPages:
- *                                  type: integer
- *                              currentPage:
- *                                  type: integer
- *                              jobs:
- *                                  type: array
- *                                  items:
- *                                      type: object
- *                                      properties:
- *                                          company:
- *                                              type: string
- *                                              example: 'ABC Corp.'
- *                                          title:
- *                                              type: string
- *                                              example: 'Software Engineer'
- *                                          location:
- *                                              type: string
- *                                              example: 'Seoul'
- *                                          salary:
- *                                              type: object
- *                                              properties:
- *                                                  min:
- *                                                      type: integer
- *                                                      example: 50000
- *                                                  max:
- *                                                      type: integer
- *                                                      example: 100000
  *          500:
  *              description: 서버 오류
  */
@@ -126,7 +92,7 @@ router.get("/", getJobs);
  *                              type: array
  *                              items:
  *                                  type: string
- *                              example: ['IT', 'Software']
+ *                              example: ['프런트', '백엔드','데이터분석']
  *                          salary:
  *                              type: object
  *                              properties:
@@ -139,17 +105,6 @@ router.get("/", getJobs);
  *      responses:
  *          201:
  *              description: 채용 공고가 성공적으로 등록되었습니다.
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              company:
- *                                  type: string
- *                                  example: 'test'
- *                              title:
- *                                  type: string
- *                                  example: 'Software Engineer'
  *          400:
  *              description: 요청에 잘못된 형식이 있습니다.
  */
@@ -185,14 +140,6 @@ router.post("/", createJob);
  *      responses:
  *          200:
  *              description: 채용 공고가 성공적으로 수정되었습니다.
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              title:
- *                                  type: string
- *                                  example: '경력직 소프트웨어 개발자 모집'
  *          404:
  *              description: 해당 채용 공고를 찾을 수 없습니다.
  */
@@ -239,27 +186,10 @@ router.delete("/:id", deleteJob);
  *            required: false
  *            schema:
  *              type: string
- *              example: 'test'
  *            description: 회사 이름으로 검색
  *      responses:
  *          200:
  *              description: 검색된 채용 공고 목록
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: array
- *                          items:
- *                              type: object
- *                              properties:
- *                                  company:
- *                                      type: string
- *                                      example: 'test'
- *                                  title:
- *                                      type: string
- *                                      example: '소프트웨어 회사'
- *                                  location:
- *                                      type: string
- *                                      example: '서울'
  *          500:
  *              description: 서버 오류
  */
@@ -281,31 +211,10 @@ router.get('/search', searchJobs);
  *            required: true
  *            schema:
  *              type: string
- *              example: '672c8ea05a4e5098b667e2af'
  *            description: 채용 공고 ID
  *      responses:
  *          200:
  *              description: 채용 공고의 상세 정보가 반환됩니다.
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              company:
- *                                  type: string
- *                                  example: 'test'
- *                              title:
- *                                  type: string
- *                                  example: '소프트웨어 회사'
- *                              salary:
- *                                  type: object
- *                                  properties:
- *                                      min:
- *                                          type: integer
- *                                          example: 50000
- *                                      max:
- *                                          type: integer
- *                                          example: 100000
  *          404:
  *              description: 해당 채용 공고를 찾을 수 없습니다.
  */
@@ -327,7 +236,6 @@ router.get("/:id", getJobById);
  *            required: true
  *            schema:
  *              type: string
- *              example: '672c8ea05a4e5098b667e2af'
  *            description: 채용 공고 ID
  *      responses:
  *          204:
@@ -351,24 +259,11 @@ router.patch("/:id/view", incrementJobViews);
  *            required: true
  *            schema:
  *              type: string
- *              example: '672c8ea05a4e5098b667e2af'
+ *              example: '672c8e305a4e5098b667d3dd'
  *            description: 채용 공고 ID
  *      responses:
  *          200:
  *              description: 관련 채용 공고들이 반환됩니다.
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: array
- *                          items:
- *                              type: object
- *                              properties:
- *                                  company:
- *                                      type: string
- *                                      example: 'test'
- *                                  title:
- *                                      type: string
- *                                      example: 'Junior Developer'
  *          404:
  *              description: 해당 채용 공고를 찾을 수 없습니다.
  */

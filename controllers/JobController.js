@@ -216,6 +216,14 @@ const recommendRelatedJobs = async (req, res) => {
             _id: { $ne: id }  // 현재 공고는 제외
         }).limit(5); // 관련 공고 5개 추천
 
+        if (relatedJobs.length === 0) {
+            return res.status(200).json({
+                status: "success",
+                message: "관련 공고가 없습니다.",
+                data: []
+            });
+        }
+
         res.status(200).json({
             status: "success",
             data: relatedJobs

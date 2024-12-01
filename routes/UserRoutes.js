@@ -149,30 +149,6 @@ router.post("/refresh", refreshToken);
  *      responses:
  *          200:
  *              description: 활동 기록 목록 반환
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              logs:
- *                                  type: array
- *                                  items:
- *                                      type: object
- *                                      properties:
- *                                          userId:
- *                                              type: string
- *                                              example: 60c72b2f9b1d8b3e4f6e63e5
- *                                          activityType:
- *                                              type: string
- *                                              enum: [login, logout]
- *                                              example: login
- *                                          description:
- *                                              type: string
- *                                              example: '사용자가 로그인했습니다.'
- *                                          timestamp:
- *                                              type: string
- *                                              format: date-time
- *                                              example: '2024-05-01T12:00:00Z'
  *          404:
  *              description: 활동 기록이 없습니다.
  *          500:
@@ -351,34 +327,6 @@ router.post("/applications",authMiddleware,applyJob);
  */
 router.get("/applications",authMiddleware, getApplications);
 
-// 지원 취소
-/**
- * @swagger
- * /auth/applications/{id}:
- *  delete:
- *      tags:
- *        - "Application"
- *      summary: 지원 취소
- *      description: 사용자가 지원한 채용 공고에 대한 지원을 취소합니다.
- *      security:
- *        - BearerAuth: []
- *      parameters:
- *          - in: path
- *            name: id
- *            required: true
- *            description: 지원 내역의 ID
- *            schema:
- *              type: string
- *      responses:
- *          200:
- *              description: 지원 취소 완료
- *          404:
- *              description: 지원 내역을 찾을 수 없는 경우
- *          500:
- *              description: 서버 오류
- */
-router.delete("/applications/:id", authMiddleware, cancelApplication);
-
 // 지원 상태 업데이트
 /**
  * @swagger
@@ -397,14 +345,18 @@ router.delete("/applications/:id", authMiddleware, cancelApplication);
  *            description: 지원 내역의 ID
  *            schema:
  *              type: string
- *          - in: body
- *            name: status
- *            description: 업데이트할 상태 (accepted, rejected, cancelled)
- *            required: true
- *            schema:
- *              type: string
- *              enum: [accepted, rejected, cancelled]
- *              example: accepted
+ *              example: 지원 내역의 ID
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          status:
+ *                              type: string
+ *                              enum: [pending, accepted, rejected, cancelled]
+ *                              example: accepted
  *      responses:
  *          200:
  *              description: 지원 상태가 업데이트되었습니다.
@@ -414,5 +366,35 @@ router.delete("/applications/:id", authMiddleware, cancelApplication);
  *              description: 서버 오류
  */
 router.patch("/applications/:id/status", authMiddleware, updateApplicationStatus);
+
+// 지원 취소
+/**
+ * @swagger
+ * /auth/applications/{id}:
+ *  delete:
+ *      tags:
+ *        - "Application"
+ *      summary: 지원 취소
+ *      description: 사용자가 지원한 채용 공고에 대한 지원을 취소합니다.
+ *      security:
+ *        - BearerAuth: []
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            required: true
+ *            description: 지원 내역의 ID
+ *            schema:
+ *              type: string
+ *              example: 삭제할 지원 내역 ID
+ *      responses:
+ *          200:
+ *              description: 지원 취소 완료
+ *          404:
+ *              description: 지원 내역을 찾을 수 없는 경우
+ *          500:
+ *              description: 서버 오류
+ */
+router.delete("/applications/:id", authMiddleware, cancelApplication);
+
 
 module.exports = router;

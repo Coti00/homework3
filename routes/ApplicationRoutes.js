@@ -20,17 +20,10 @@ const {
  *         schema:
  *           type: string
  *         description: "채용 공고의 ID"
- *         example: "672c8ea05a4e5098b667e2af"
+ *         example: "채용 공고 ID"
  *     responses:
  *       200:
  *         description: "지원 통계 반환"
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 stats:
- *                   $ref: '#/components/schemas/ApplicationStats'
  *       404:
  *         description: "채용 공고에 대한 지원 통계를 찾을 수 없음"
  *       500:
@@ -53,7 +46,7 @@ router.get("/application-stats/:jobId", getApplicationStats);
  *         schema:
  *           type: string
  *         description: "채용 공고의 ID"
- *         example: "672c8ea05a4e5098b667e2af"
+ *         example: "채용 공고 ID"
  *     requestBody:
  *       required: true
  *       content:
@@ -76,10 +69,6 @@ router.get("/application-stats/:jobId", getApplicationStats);
  *     responses:
  *       200:
  *         description: "지원 내역 통계가 업데이트되었습니다."
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ApplicationStats'
  *       404:
  *         description: "채용 공고를 찾을 수 없음"
  *       500:

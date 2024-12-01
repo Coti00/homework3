@@ -136,7 +136,12 @@ const deleteCompany = async (req, res) => {
                 code: "COMPANY_NOT_FOUND"
             });
         }
-        res.status(204).send(); // 삭제 성공
+        res.status(204).send({
+            status: "success",
+            data: {
+                message: "회사정보가 성공적으로 삭제되었습니다."
+            }
+        }); // 삭제 성공
     } catch (error) {
         console.error(error);
         res.status(500).send({

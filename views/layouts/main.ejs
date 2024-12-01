@@ -206,6 +206,15 @@
             font: bold 13px 'arial';
             padding: 5px 10px;
         }
+        #filterForm{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #headerbutton{
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -222,19 +231,27 @@
     </header>
     <section id="filters">
         <form id="filterForm">
-            <label for="keyword">키워드:</label>
-            <input type="text" id="keyword" name="keyword" placeholder="예: 개발자, 엔지니어" />
-    
-            <label for="companyName">회사명:</label>
-            <input type="text" id="companyName" name="company_name" placeholder="예: 삼성, 네이버" />
-    
-            <label for="position">포지션:</label>
-            <input type="text" id="position" name="position" placeholder="예: 백엔드, 프론트엔드" />
-    
-            <button type="submit" id="search">검색</button>
-            <button type="button" id="resetFilters">초기화</button>
+            <div>
+                <label for="location">위치:</label>
+                <input type="text" id="location" name="location" placeholder="예: 서울" />
+            
+                <label for="experience">경력:</label>
+                <input type="text" id="experience" name="experience" placeholder="예: 10년, 신입" />
+            
+                <label for="salary">급여:</label>
+                <input type="number" id="salary" name="salary" placeholder="예: 5000 (단위: 만원)" />
+            
+                <label for="technology">기술 분야:</label>
+                <input type="text" id="technology" name="technology" placeholder="예: 백엔드, 프론트엔드" />    
+            </div>
+           
+            <div id="headerbutton">
+                <button type="submit" id="search">검색</button>
+                <button type="button" id="resetFilters">초기화</button>
+            </div>
         </form>
     </section>
+    
     <!-- 채용 공고 리스트 -->
     <main>
         <section id="jobList">
@@ -325,10 +342,20 @@
             event.preventDefault();
 
             const filters = {
-                keyword: document.getElementById('keyword').value.trim(),
-                company_name: document.getElementById('companyName').value.trim(),
-                position: document.getElementById('position').value.trim(),
+                location: document.getElementById('location').value.trim(),
+                experience: document.getElementById('experience').value.trim(),
+                salary: document.getElementById('salary').value.trim(),
+                technology: document.getElementById('technology').value.trim(),
             };
+
+            if (filters.salary) {
+            const salaryValue = Number(filters.salary);
+            if (!isNaN(salaryValue)) {
+                filters.salary = salaryValue * 10000;
+            } else {
+                delete filters.salary;  // 숫자가 아니라면 필터에서 삭제
+            }
+    }
 
             // 필터 값이 비어있는 경우 제외
             Object.keys(filters).forEach((key) => {
@@ -351,10 +378,11 @@
             const queryParams = new URLSearchParams({
                 page,
                 limit: itemsPerPage,
-                ...filters,
+                sort: 'date',  // 기본값
+                filter: JSON.stringify(filters),  // filter를 JSON 문자열로 변환하여 쿼리 파라미터로 전달
             }).toString();
 
-            fetch(`http://localhost:3000/jobs/search?${queryParams}`, {
+            fetch(`http://localhost:3000/jobs?${queryParams}`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` },
             })
