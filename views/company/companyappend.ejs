@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회사 추가</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 0;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #logotitle {
+            font: bold 20px 'arial';
+        }
+        #logotitle:hover {
+            cursor: pointer;
+        }
+        #headerwrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        #logoutBtn, #myPageBtn, #companyinfo {
+            color: white;
+            font: 500 15px 'arial';
+            margin-inline: 10px;
+        }
+        #logoutBtn:hover, #myPageBtn:hover, #companyinfo:hover {
+            cursor: pointer;
+            color: gray;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, textarea, button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #2c3e50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1a252f;
+        }
+        #addCompanyForm{
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header style="margin-bottom: 30px;">
+        <div class="header-content">
+            <p id="logotitle" onclick="window.location.href = '/main'">알려잡!</p>
+            <div id="headerwrapper">
+                <p id="companyinfo" onclick="window.location.href='/companyinfo'">회사찾기</p>
+                <p id="myPageBtn" onclick="window.location.href='/profile'">My Page</p>
+                <p id="logoutBtn" onclick="window.location.href='/'">로그아웃</p>
+            </div>
+        </div>
+    </header>
+
+    <h1>회사 추가</h1>
+    <form id="addCompanyForm">
+        <label for="company_name">회사명</label>
+        <input type="text" id="company_name" name="company_name" required placeholder="회사명">
+
+        <label for="company_type">회사 유형</label>
+        <input type="text" id="company_type" name="company_type" required placeholder="회사 유형">
+
+        <label for="website">웹사이트</label>
+        <input type="url" id="website" name="website" required placeholder="http://example.com">
+
+        <label for="address">주소</label>
+        <input type="text" id="address" name="address" required placeholder="회사 주소">
+
+        <label for="employee_count">직원 수</label>
+        <input type="number" id="employee_count" name="employee_count" required placeholder="직원 수">
+
+        <label for="industry">산업군</label>
+        <input type="text" id="industry" name="industry" required placeholder="산업군">
+
+        <label for="ceo_name">CEO 이름</label>
+        <input type="text" id="ceo_name" name="ceo_name" required placeholder="CEO 이름">
+
+        <label for="description">회사 설명</label>
+        <textarea id="description" name="description" required placeholder="회사 설명"></textarea>
+
+        <label for="establish_date">설립일</label>
+        <input type="date" id="establish_date" name="establish_date" required>
+
+        <label for="revenue">연간 수익</label>
+        <input type="number" id="revenue" name="revenue" required placeholder="연간 수익">
+
+        <label for="salary">평균 연봉</label>
+        <input type="number" id="salary" name="salary" required placeholder="평균 연봉">
+
+        <button type="submit">회사 추가</button>
+    </form>
+
+    <script>
+        document.getElementById('addCompanyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem('accessToken'); // 토큰 가져오기
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            const companyData = {
+                company_name: document.getElementById('company_name').value.trim(),
+                company_type: document.getElementById('company_type').value.trim(),
+                website: document.getElementById('website').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                employee_count: parseInt(document.getElementById('employee_count').value, 10),
+                industry: document.getElementById('industry').value.trim(),
+                ceo_name: document.getElementById('ceo_name').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                establish_date: document.getElementById('establish_date').value.trim(),
+                revenue: parseFloat(document.getElementById('revenue').value),
+                salary: parseFloat(document.getElementById('salary').value),
+            };
+
+            fetch('http://localhost:3000/company', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(companyData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('회사가 성공적으로 추가되었습니다.');
+                    document.getElementById('addCompanyForm').reset();
+                } else {
+                    alert('회사 추가에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('회사 추가 오류:', error);
+                alert('서버 오류가 발생했습니다.');
+            });
+        });
+
+    </script>
+</body>
+</html>

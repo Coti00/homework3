@@ -216,7 +216,7 @@ router.get("/profile", authMiddleware, getUserProfile);
  *      security:
  *        - BearerAuth: [] 
  *      responses:
- *          204:
+ *          200:
  *              description: 사용자 계정 삭제 성공
  *          500:
  *              description: 서버 오류

@@ -42,7 +42,12 @@ app.get('/companyinfo',(req,res)=>{
 app.get('/companyreview',(req,res) => {
     res.render('company/review');
 });
-
+app.get('/companyappend',(req,res)=>{
+    res.render('company/companyappend');
+});
+app.get('/jobappend',(req,res)=>{
+    res.render('job/jobappend');
+});
 
 
 app.use(express.json());

@@ -109,7 +109,7 @@ const deleteJob = async (req, res) => {
                 code: "JOB_NOT_FOUND"
             });
         }
-        res.status(204).send({
+        res.status(200).send({
             status: "success",
             message: "채용 공고가 삭제되었습니다."
         }); // 삭제 성공

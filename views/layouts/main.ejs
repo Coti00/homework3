@@ -215,6 +215,17 @@
         #headerbutton{
             margin-top: 20px;
         }
+        .delete-btn{
+            background-color: rgb(230, 74, 74);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-btn:hover{
+            background-color: rgb(227, 144, 144);
+        }
     </style>
 </head>
 <body>
@@ -405,10 +416,11 @@
                                 <p><strong>직무 분야:</strong> ${job.job_sector?.join(', ') || '정보 없음'}</p>
                                 <p><strong>연봉:</strong> ${job.salary || '협의 가능'} 원</p>
                                 <p><strong>조회수:</strong> ${job.views}</p>
-                                <a href="${job.link}" target="_blank">채용 공고 보기</a>
+                                <a href="${job.link}"  class="view-job-link" data-job-id="${job._id}" data-job-link="${job.link}">채용 공고 보기</a>
                                 <br>
                                 <button class="apply-btn" data-job-id="${job._id}">지원하기</button>
                                 <button class="bookmark-btn" data-job-id="${job._id}">북마크</button>
+                                <button class="delete-btn" data-job-id="${job._id}">삭제</button>
                             `;
 
                             const bookmarkButton = jobCard.querySelector('.bookmark-btn');
@@ -417,12 +429,27 @@
                                 bookmarkButton.classList.add('active');
                             }
 
+                            const viewJobLinks = jobCard.querySelectorAll('.view-job-link');
+                            viewJobLinks.forEach(viewJobLink => {
+                                viewJobLink.addEventListener('click', function (event) {
+                                    event.preventDefault(); // 기본 링크 동작 막기
+                                    const jobId = this.dataset.jobId;
+                                    const jobLink = this.dataset.jobLink;
+                                    incrementJobViews(jobId, jobLink);
+                                });
+                            });
+
                             bookmarkButton.addEventListener('click', () => toggleBookmark(job._id, bookmarkButton));
 
                             const applyButton = jobCard.querySelector('.apply-btn');
                             applyButton.addEventListener('click', () => applyForJob(job._id));
 
                             jobListSection.appendChild(jobCard);
+
+                            const deleteButton = jobCard.querySelector('.delete-btn');
+                            deleteButton.addEventListener('click', function () {
+                                deleteJob(job._id, jobCard);
+                            });
                         });
 
                     } else {
@@ -452,10 +479,11 @@
                             <p><strong>직무 분야:</strong> ${job.job_sector.join(', ')}</p>
                             <p><strong>연봉:</strong> ${job.salary} 원</p>
                             <p><strong>조회수:</strong> ${job.views}</p>
-                            <a href="${job.link}" target="_blank">채용 공고 보기</a>
+                            <a href="${job.link}" class="view-job-link" data-job-id="${job._id}" data-job-link="${job.link}">채용 공고 보기</a>
                             <br>
                             <button class="apply-btn" data-job-id="${job._id}">지원하기</button>
                             <button class="bookmark-btn" data-job-id="${job._id}">북마크</button>
+                            <button class="delete-btn" data-job-id="${job._id}">삭제</button>
                         `;
 
                         const bookmarkButton = jobCard.querySelector('.bookmark-btn');
@@ -463,12 +491,22 @@
                             bookmarkButton.classList.add('active');
                         }
 
+                        const viewJobLinks = jobCard.querySelectorAll('.view-job-link');
+                        viewJobLinks.forEach(viewJobLink => {
+                            viewJobLink.addEventListener('click', function (event) {
+                                event.preventDefault(); // 기본 링크 동작 막기
+                                const jobId = this.dataset.jobId;
+                                const jobLink = this.dataset.jobLink;
+                                incrementJobViews(jobId, jobLink);
+                            });
+                        });
+
                         // 지원 상태 확인
                         const userApplications = JSON.parse(localStorage.getItem('userApplications')) || [];
                         if (userApplications.includes(job._id)) {
                             const applyButton = jobCard.querySelector('.apply-btn');
                             applyButton.classList.add('active'); // 지원된 경우 버튼 색상 변경
-                            applyButton.innerText = '이미 지원한 공고';
+                            applyButton.innerText = '지원한 공고';
                             applyButton.disabled = true; // 이미 지원한 경우 버튼 비활성화
                         }
 
@@ -483,6 +521,12 @@
                         bookmarkButton.addEventListener('click', function() {
                             toggleBookmark(job._id, bookmarkButton);
                         });
+
+                        const deleteButton = jobCard.querySelector('.delete-btn');
+                            deleteButton.addEventListener('click', function () {
+                                deleteJob(job._id, jobCard);
+                        });
+                        
                     });
 
                     // 페이지네이션 버튼 생성
@@ -593,6 +637,62 @@
                 }
             })
             .catch(error => console.error('지원 처리 오류:', error));
+        }
+
+        function deleteJob(jobId, jobCardElement) {
+            const confirmDelete = confirm('정말로 이 채용 공고를 삭제하시겠습니까?');
+            if (!confirmDelete) return;
+
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            fetch(`http://localhost:3000/jobs/${jobId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('채용 공고가 성공적으로 삭제되었습니다.');
+                        jobCardElement.remove(); // 삭제된 채용 공고 카드를 제거
+                    } else {
+                        alert('채용 공고 삭제에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('채용 공고 삭제 오류:', error);
+                    alert('채용 공고 삭제 중 오류가 발생했습니다.');
+                });
+        }
+
+        function incrementJobViews(jobId, jobLink) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            fetch(`http://localhost:3000/jobs/${jobId}/view`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('조회수 증가 요청 실패');
+                }
+                // 조회수 증가 후 원래 링크로 이동
+                window.open(jobLink, '_blank');
+            })
+            .catch(error => console.error('조회수 증가 오류:', error));
         }
     </script>
 </body>

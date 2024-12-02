@@ -178,16 +178,35 @@
         }
 
         #editProfileBtn{
-            margin-bottom: 50px;
             font: bold 14px 'arial';
-            margin: 10px 0;
             padding: 5px 10px;
+            margin-top: 5px;
+            margin-inline: 10px;
         }
         #deleteAccountBtn{
             background: transparent;
             color: red;
-            margin-bottom: 50px;
+            margin-top: 5px;
             font: bold 14px 'arial';
+        }
+        #companyplus{
+            font: bold 14px 'arial';
+            margin-top: 5px;
+            padding: 5px 10px;
+            margin-inline: 10px;
+
+        }
+        #jobplus{
+            font: bold 14px 'arial';
+            margin-top: 5px;
+            padding: 5px 10px;
+            margin-inline: 10px;
+
+        }
+        #footerbutton{
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -237,8 +256,11 @@
 
     <div class="profile-actions">
         <!-- 회원정보 수정 버튼 -->
-        <button id="editProfileBtn">회원정보 수정</button>
-        
+        <div id="footerbutton">
+            <button id="editProfileBtn">회원정보 수정</button>
+            <button id="companyplus">회사 정보 추가</button>
+            <button id="jobplus">채용 정보 추가</button>
+        </div>
         <!-- 회원탈퇴 버튼 -->
         <button id="deleteAccountBtn">회원탈퇴</button>
     </div>
@@ -374,6 +396,84 @@
                 .catch(error => console.log('활동 기록 로드 오류:', error));
             }
             loadUserLogs(logsPage);
+
+            function loadApplications(page) {
+                fetch(`http://localhost:3000/auth/applications?page=${page}&limit=${itemsPerPage}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('응답 데이터:', data); // 응답 데이터 확인
+
+                    const applicationsList = document.getElementById('applicationsList');
+                    applicationsList.innerHTML = ''; // 기존 목록 비우기
+
+                    const applications = data.data?.applications || [];
+                    applications.forEach(application => {
+                        if (application.jobId && application.jobId.title) {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `
+                                ${application.jobId.title} 
+                                <span class="delete-application" data-application-id="${application._id}">지원 취소</span>
+                            `;
+                            applicationsList.appendChild(listItem);
+                        } else {
+                            console.warn('jobId 또는 title이 없는 지원 항목:', application);
+                        }
+                    });
+
+                    // 지원 취소 이벤트 추가
+                    document.querySelectorAll('.delete-application').forEach(deleteBtn => {
+                        deleteBtn.addEventListener('click', function() {
+                            const applicationId = this.getAttribute('data-application-id');
+                            cancelApplication(applicationId, this.parentElement);
+                        });
+                    });
+
+                    // 페이지네이션 처리
+                    const pagination = document.getElementById('applicationsPagination');
+                    pagination.innerHTML = ''; // 페이지네이션 초기화
+
+                    const totalPages = data.pagination?.totalPages || 1; // 총 페이지 수 가져오기
+
+                    if (totalPages > 1) {
+                        if (page > 1) { // 이전 버튼 추가
+                            const prevButton = document.createElement('button');
+                            prevButton.textContent = '이전';
+                            prevButton.addEventListener('click', () => {
+                                loadApplications(page - 1); // 이전 페이지 로드
+                            });
+                            pagination.appendChild(prevButton);
+                        }
+
+                        const pageSpan = document.createElement('span'); // 현재 페이지 / 총 페이지 표시
+                        pageSpan.textContent = `${page} / ${totalPages}`;
+                        pagination.appendChild(pageSpan);
+
+                        if (page < totalPages) { // 다음 버튼 추가
+                            const nextButton = document.createElement('button');
+                            nextButton.textContent = '다음';
+                            nextButton.addEventListener('click', () => {
+                                loadApplications(page + 1); // 다음 페이지 로드
+                            });
+                            pagination.appendChild(nextButton);
+                        }
+                    } else {
+                        const pageSpan = document.createElement('span');
+                        pageSpan.textContent = `1 / 1`;
+                        pagination.appendChild(pageSpan);
+                    }
+                })
+                .catch(error => console.error('지원 내역 로드 오류:', error));
+            }
+
+            loadApplications(applicationsPage);
         } else {
             alert('로그인이 필요합니다.');
             window.location.href = '/'; // 로그인 페이지로 리디렉션
@@ -382,6 +482,14 @@
         // 회원정보 수정 버튼 클릭 시 동작
         document.getElementById('editProfileBtn').addEventListener('click', () => {
             window.location.href = '/editprofile'; // 회원정보 수정 페이지로 리디렉션
+        });
+
+        document.getElementById('companyplus').addEventListener('click',()=>{
+            window.location.href = '/companyappend';
+        });
+
+        document.getElementById('jobplus').addEventListener('click',()=>{
+            window.location.href = '/jobappend';
         });
 
         // 회원탈퇴 버튼 클릭 시 동작
@@ -464,100 +572,43 @@
         }
 
         // 지원 내역 가져오기
-        function loadApplications(page) {
-            fetch(`http://localhost:3000/auth/applications?page=${page}&limit=${itemsPerPage}`, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('응답 데이터:', data); // 응답 데이터 확인
-
-                const applicationsList = document.getElementById('applicationsList');
-                applicationsList.innerHTML = ''; // 기존 목록 비우기
-
-                const applications = data.data?.applications || [];
-                applications.forEach(application => {
-                    if (application.jobId && application.jobId.title) {
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `
-                            ${application.jobId.title} 
-                            <span class="delete-application" data-application-id="${application._id}">지원 취소</span>
-                        `;
-                        applicationsList.appendChild(listItem);
-                    } else {
-                        console.warn('jobId 또는 title이 없는 지원 항목:', application);
-                    }
-                });
-
-                // 지원 취소 이벤트 추가
-                document.querySelectorAll('.delete-application').forEach(deleteBtn => {
-                    deleteBtn.addEventListener('click', function() {
-                        const applicationId = this.getAttribute('data-application-id');
-                        cancelApplication(applicationId, this.parentElement);
-                    });
-                });
-
-                // 페이지네이션 처리
-                const pagination = document.getElementById('applicationsPagination');
-                pagination.innerHTML = ''; // 페이지네이션 초기화
-
-                const totalPages = data.pagination?.totalPages || 1; // 총 페이지 수 가져오기
-
-                if (totalPages > 1) {
-                    if (page > 1) { // 이전 버튼 추가
-                        const prevButton = document.createElement('button');
-                        prevButton.textContent = '이전';
-                        prevButton.addEventListener('click', () => {
-                            loadApplications(page - 1); // 이전 페이지 로드
-                        });
-                        pagination.appendChild(prevButton);
-                    }
-
-                    const pageSpan = document.createElement('span'); // 현재 페이지 / 총 페이지 표시
-                    pageSpan.textContent = `${page} / ${totalPages}`;
-                    pagination.appendChild(pageSpan);
-
-                    if (page < totalPages) { // 다음 버튼 추가
-                        const nextButton = document.createElement('button');
-                        nextButton.textContent = '다음';
-                        nextButton.addEventListener('click', () => {
-                            loadApplications(page + 1); // 다음 페이지 로드
-                        });
-                        pagination.appendChild(nextButton);
-                    }
-                } else {
-                    const pageSpan = document.createElement('span');
-                    pageSpan.textContent = `1 / 1`;
-                    pagination.appendChild(pageSpan);
-                }
-            })
-            .catch(error => console.error('지원 내역 로드 오류:', error));
-        }
-
-        loadApplications(applicationsPage);
-
         function cancelApplication(applicationId, listItemElement) {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            // 로컬 스토리지에서 지원 내역 삭제
+            let userApplications = JSON.parse(localStorage.getItem('userApplications')) || [];
+            userApplications = userApplications.filter(id => id !== applicationId); // 해당 지원 내역 삭제
+            localStorage.setItem('userApplications', JSON.stringify(userApplications));
+
+            // UI에서 지원 내역 항목 제거
+            listItemElement.remove();
+
+            console.log("삭제 요청된 applicationId:", applicationId); // 삭제할 applicationId 출력
+
+            // 서버에 지원 취소 요청
             fetch(`http://localhost:3000/auth/applications/${applicationId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             })
             .then(response => response.json())
             .then(data => {
+                console.log("서버 응답:", data); // 서버 응답 출력
                 if (data.status === 'success') {
-                    listItemElement.remove(); // 성공 시 UI에서 항목 제거
                     alert('지원 내역이 취소되었습니다.');
                 } else {
-                    alert('지원 취소에 실패했습니다.');
+                    alert('지원 취소 실패');
                 }
             })
-            .catch(error => console.error('지원 취소 오류:', error));
+            .catch(error => {
+                console.error('지원 취소 오류:', error);
+                alert('지원 취소 중 오류가 발생했습니다.');
+            });
         }
+
 
 
     </script>

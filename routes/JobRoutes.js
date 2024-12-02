@@ -94,14 +94,8 @@ router.get("/", getJobs);
  *                                  type: string
  *                              example: ['프런트', '백엔드','데이터분석']
  *                          salary:
- *                              type: object
- *                              properties:
- *                                  min:
- *                                      type: integer
- *                                      example: 50000
- *                                  max:
- *                                      type: integer
- *                                      example: 100000
+ *                              type: Nuber
+ *                              example: 50000000
  *      responses:
  *          201:
  *              description: 채용 공고가 성공적으로 등록되었습니다.
@@ -163,7 +157,7 @@ router.put("/:id", updateJob);
  *              type: string
  *            description: 채용 공고 ID
  *      responses:
- *          204:
+ *          200:
  *              description: 채용 공고가 성공적으로 삭제되었습니다.
  *          404:
  *              description: 해당 채용 공고를 찾을 수 없습니다.

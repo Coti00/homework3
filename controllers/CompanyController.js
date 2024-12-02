@@ -5,6 +5,7 @@ const getAllCompanies = async (req, res) => {
     try {
         const { name, type,salary, page = 1, limit = 10, sort } = req.query;
 
+        console.log("서버로 들어온 salary:", salary);
         // 쿼리 생성
         const query = {};
 
@@ -15,11 +16,12 @@ const getAllCompanies = async (req, res) => {
 
         // company_type 필터링
         if (type) {
-            query.company_type = type;
+            query.company_type = { $regex: type, $options: "i" }; // 대소문자 구분 없이 필터
         }
+        
 
-        if (salary){
-            query.salary = {$gte: Number(salary)};
+        if (salary) {
+            query.salary = { $gte: parseInt(salary, 10) }; // 클라이언트에서 전달된 값을 숫자로 변환 후 비교
         }
 
         // 정렬 조건 설정
@@ -136,11 +138,9 @@ const deleteCompany = async (req, res) => {
                 code: "COMPANY_NOT_FOUND"
             });
         }
-        res.status(204).send({
+        res.status(200).send({
             status: "success",
-            data: {
-                message: "회사정보가 성공적으로 삭제되었습니다."
-            }
+            message: "회사정보가 성공적으로 삭제되었습니다."
         }); // 삭제 성공
     } catch (error) {
         console.error(error);

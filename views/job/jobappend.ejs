@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채용 공고 등록</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 0;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #logotitle {
+            font: bold 20px 'arial';
+        }
+        #logotitle:hover {
+            cursor: pointer;
+        }
+        #headerwrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        #logoutBtn, #myPageBtn, #companyinfo {
+            color: white;
+            font: 500 15px 'arial';
+            margin-inline: 10px;
+        }
+        #logoutBtn:hover, #myPageBtn:hover, #companyinfo:hover {
+            cursor: pointer;
+            color: gray;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, textarea, button, select {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #2c3e50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1a252f;
+        }
+        #addJobForm {
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header style="margin-bottom: 30px;">
+        <div class="header-content">
+            <p id="logotitle" onclick="window.location.href = '/main'">알려잡!</p>
+            <div id="headerwrapper">
+                <p id="companyinfo" onclick="window.location.href='/companyinfo'">회사찾기</p>
+                <p id="myPageBtn" onclick="window.location.href='/profile'">My Page</p>
+                <p id="logoutBtn" onclick="window.location.href='/'">로그아웃</p>
+            </div>
+        </div>
+    </header>
+
+    <h1>채용 공고 등록</h1>
+    <form id="addJobForm">
+        <label for="company">회사명</label>
+        <input type="text" id="company" name="company" required placeholder="회사명">
+
+        <label for="title">공고 제목</label>
+        <input type="text" id="title" name="title" required placeholder="공고 제목">
+
+        <label for="link">공고 링크</label>
+        <input type="url" id="link" name="link" required placeholder="공고 링크">
+
+        <label for="location">지역</label>
+        <input type="text" id="location" name="location" required placeholder="지역">
+
+        <label for="career">경력</label>
+        <input type="text" id="career" name = "career" required placeholder="경력, 신입">
+
+        <label for="education">학력</label>
+        <input type="text" id="education" name="education" required placeholder="학력">
+
+        <label for="job_sector">직무 분야</label>
+        <input type="text" id="job_sector" name="job_sector" required placeholder="프런트, 백엔드, 데이터분석">
+
+        <label for="salary"> 연봉</label>
+        <input type="number" id="salary" name="salary" required placeholder="연봉">
+
+        <button type="submit">채용 공고 등록</button>
+    </form>
+
+    <script>
+        document.getElementById('addJobForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem('accessToken'); // 토큰 가져오기
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            const salaryValue = parseInt(document.getElementById('salary').value, 10);
+
+            // salary 값 유효성 검사
+            if (isNaN(salaryValue) || salaryValue <= 0) {
+                alert('유효한 연봉을 입력하세요.');
+                return;
+            }
+
+            const jobData = {
+                company: document.getElementById('company').value.trim(),
+                title: document.getElementById('title').value.trim(),
+                link: document.getElementById('link').value.trim(),
+                location: document.getElementById('location').value.trim(),
+                career: document.getElementById('career').value.trim().split(',').map(c => c.trim()),
+                education: document.getElementById('education').value.trim(),
+                job_sector: document.getElementById('job_sector').value.trim().split(',').map(c => c.trim()),
+                salary: salaryValue
+            };
+
+            fetch('http://localhost:3000/jobs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(jobData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('채용 공고가 성공적으로 등록되었습니다.');
+                    document.getElementById('addJobForm').reset();
+                } else {
+                    alert('채용 공고 등록에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('채용 공고 등록 오류:', error);
+                alert('서버 오류가 발생했습니다.');
+            });
+        });
+    </script>
+</body>
+</html>

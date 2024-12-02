@@ -141,7 +141,7 @@ router.route("/:id").put(updateCompany); // 회사 정보 업데이트
  *           type: string
  *         description: "회사 ID"
  *     responses:
- *       204:
+ *       200:
  *         description: "회사 삭제 성공"
  *       404:
  *         description: "회사 찾을 수 없음"

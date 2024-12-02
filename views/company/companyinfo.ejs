@@ -111,7 +111,7 @@
             padding: 5px 10px;
         }
     
-        .review-button, .view-reviews-button {
+        .review-button, .view-reviews-button, .delete-company-button {
             margin-top: 10px;
             background-color: #2c3e50;
             color: white;
@@ -123,7 +123,7 @@
             font: bold 14px 'arial';
         }
     
-        .review-button:hover, .view-reviews-button:hover {
+        .review-button:hover, .view-reviews-button:hover, .delete-company-button:hover {
             background-color: gray;
         }
     
@@ -322,6 +322,7 @@
         let currentCompanyId = null;
 
         const fetchCompanies = (name, type, salary, sort, page = 1) => {
+
             resultsDiv.innerHTML = '검색 중...';
 
             let query = `/company?page=${page}`;
@@ -367,6 +368,7 @@
                     <p><strong>설명:</strong> ${company.description || '정보 없음'}</p>
                     <button class="review-button" data-company-id="${company._id}">리뷰 작성</button>
                     <button class="view-reviews-button" data-company-id="${company._id}">리뷰 보기</button>
+                    <button class="delete-company-button" data-company-id="${company._id}">회사 삭제</button>
                 `;
                 resultsDiv.appendChild(companyDiv);
             });
@@ -384,6 +386,13 @@
                     fetchReviews(companyId);
                 });
             });
+
+            document.querySelectorAll('.delete-company-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const companyId = e.target.getAttribute('data-company-id');
+                deleteCompany(companyId);
+            });
+        });
         };
 
         const fetchReviews = (companyId) => {
@@ -545,7 +554,7 @@
             const salary = document.getElementById('salaryRange').value; // 연봉 선택
             const sort = document.getElementById('revenueSort').value;
 
-            const numericSalary = salary ? parseInt(salary.replace(/,/g, ''), 10) : null;
+            const numericSalary = salary ? parseInt(salary, 10) : null;
 
             if (!name && !type && !numericSalary && !sort) {
                 resultsDiv.innerHTML = '<p>검색 조건을 입력하거나 선택하세요.</p>';
@@ -567,6 +576,45 @@
             }
             return `${revenue.toLocaleString()} 원`;
         };
+
+        const deleteCompany = (companyId) => {
+            const confirmDelete = confirm('정말로 이 회사를 삭제하시겠습니까?');
+            if (!confirmDelete) return;
+
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
+            fetch(`http://localhost:3000/company/${companyId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.status === 204 ? { status: 'success' } : response.json(); // 204 처리
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('회사가 성공적으로 삭제되었습니다.');
+                    // 삭제 후 목록 갱신
+                    fetchCompanies(null, null, null, null, currentPage);
+                } else {
+                    alert('회사 삭제 실패: ' + (data.message || '알 수 없는 오류'));
+                }
+            })
+            .catch(error => {
+                console.error('회사 삭제 오류:', error);
+                alert('회사 삭제 중 오류가 발생했습니다.');
+            });
+        };
+
     </script>
 </body>
 </html>
