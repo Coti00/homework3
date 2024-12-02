@@ -28,6 +28,11 @@ const {
  *           type: string
  *         description: "회사 유형으로 필터링"
  *       - in: query
+ *         name: salary
+ *         schema:
+ *           type: integer
+ *         description: "연봉으로 필터링 (9000 -> 9000만원)"
+ *       - in: query
  *         name: page
  *         schema:
  *           type: integer
