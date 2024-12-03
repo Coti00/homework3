@@ -409,8 +409,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('응답 데이터:', data); // 응답 데이터 확인
-
                     const applicationsList = document.getElementById('applicationsList');
                     applicationsList.innerHTML = ''; // 기존 목록 비우기
 
@@ -440,27 +438,28 @@
                     const pagination = document.getElementById('applicationsPagination');
                     pagination.innerHTML = ''; // 페이지네이션 초기화
 
-                    const totalPages = data.pagination?.totalPages || 1; // 총 페이지 수 가져오기
+                    const totalPages = data.data?.totalPages || 1; // 총 페이지 수 가져오기
+                    const currentPage = data.data?.currentPage || 1;
 
                     if (totalPages > 1) {
-                        if (page > 1) { // 이전 버튼 추가
+                        if (currentPage > 1) { // 이전 버튼 추가
                             const prevButton = document.createElement('button');
                             prevButton.textContent = '이전';
                             prevButton.addEventListener('click', () => {
-                                loadApplications(page - 1); // 이전 페이지 로드
+                                loadApplications(currentPage - 1); // 이전 페이지 로드
                             });
                             pagination.appendChild(prevButton);
                         }
 
                         const pageSpan = document.createElement('span'); // 현재 페이지 / 총 페이지 표시
-                        pageSpan.textContent = `${page} / ${totalPages}`;
+                        pageSpan.textContent = `${currentPage} / ${totalPages}`;
                         pagination.appendChild(pageSpan);
 
-                        if (page < totalPages) { // 다음 버튼 추가
+                        if (currentPage < totalPages) { // 다음 버튼 추가
                             const nextButton = document.createElement('button');
                             nextButton.textContent = '다음';
                             nextButton.addEventListener('click', () => {
-                                loadApplications(page + 1); // 다음 페이지 로드
+                                loadApplications(currentPage + 1); // 다음 페이지 로드
                             });
                             pagination.appendChild(nextButton);
                         }
