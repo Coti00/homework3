@@ -34,7 +34,7 @@
     JWT_SECRET=your-secret-key
 5. **데이터베이스 준비**
     MongoDB를 설정하고 연결 URL(MONGO_URI)을 .env 파일에 추가하세요.
-    초기 데이터를 삽입하려면 scripts/import.js를 실행하세요:
+    초기 데이터를 삽입하려면 MongoDB에 파일을 삽입하는 js코드 작성후 node 파일명을 통해 데이터를 저장하세요
 6. **서버 실행**
     node app
     애플리케이션이 기본적으로 http://localhost:3000에서 실행됩니다.
@@ -44,7 +44,7 @@
 ```bash
 homework3/
 ├── config
-│   └── dbConnect.js              # MongoDB 연결 설정
+│   └── dbConnect.js            
 │   └── swagger.config.js  
 ├── controllers
 │   ├── ApplicationController.js        
