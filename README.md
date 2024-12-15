@@ -34,7 +34,7 @@
 
     프로젝트 루트에 .env 파일을 생성하고, 아래와 같은 내용을 추가하세요
 
-    MONGO_URI=mongodb+srv://<username>:<password>@<클러스터정보>.mongodb.net/<database>
+    MONGO_URI=mongodb+srv://[username]:[password]@[클러스터정보].mongodb.net/[databasename]
     
     JWT_SECRET=your-secret-key(임의로 작성)
 5. **데이터베이스 준비**
