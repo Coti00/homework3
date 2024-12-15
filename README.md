@@ -40,10 +40,16 @@
 5. **데이터베이스 준비**
 
     MongoDB를 설정하고 연결 URL(MONGO_URI)을 .env 파일에 추가하세요.
-    초기 데이터를 삽입하려면 crawling에서 ipynb파일 실행 후 MongoDB에 파일을 삽입하는 js코드 작성후(importDB) node 파일명을 통해 데이터를 저장하세요(node importDB.js) 주의! 경로설정에 주의하세요!!
+
+    초기 데이터를 삽입하려면 crawling에서 ipynb파일 실행 후 MongoDB에 파일을 삽입하는 js코드 작성후 node 파일명을 통해 데이터를 저장하세요
+
+    [저는 루트 경로에서 클롤링 파일(json)을 옮긴 뒤 importDB.js(json파일 디비 연결코드)를 node importDB.js를 터미널에서 입력하여 실행하였음]
+
+    [주의! 경로설정에 주의하세요!!]
 6. **서버 실행**
 
     node app
+    
     애플리케이션이 기본적으로 http://localhost:3000에서 실행됩니다.
 
 
