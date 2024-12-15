@@ -30,11 +30,12 @@
     npm install
 4. **환경 변수 설정**
     프로젝트 루트에 .env 파일을 생성하고, 아래와 같은 내용을 추가하세요
-    MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/<database>
-    JWT_SECRET=your-secret-key
+    MONGO_URI=mongodb+srv://<username>:<password>@<클러스터정보>.mongodb.net/<database>
+    
+    JWT_SECRET=your-secret-key(임의로 작성)
 5. **데이터베이스 준비**
     MongoDB를 설정하고 연결 URL(MONGO_URI)을 .env 파일에 추가하세요.
-    초기 데이터를 삽입하려면 MongoDB에 파일을 삽입하는 js코드 작성후 node 파일명을 통해 데이터를 저장하세요
+    초기 데이터를 삽입하려면 MongoDB에 파일을 삽입하는 js코드 작성후(importDB) node 파일명을 통해 데이터를 저장하세요(node importDB.js)
 6. **서버 실행**
     node app
     애플리케이션이 기본적으로 http://localhost:3000에서 실행됩니다.
@@ -52,7 +53,10 @@ homework3/
 │   ├── CompanyController.js 
 │   ├── CompanyReviewController.js 
 │   ├── JobController.js       
-│   └── UserController.js  
+│   └── UserController.js
+├── crawling
+│   ├── crawling.ipynb            
+│   └── importDB.js  
 ├── middleware
 │   └── authMiddleware.js    
 ├── models
